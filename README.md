@@ -40,6 +40,7 @@ Rapyd::Register("MAIN_THREAD");
 Step 3: Call the Rapyd Logger
 ```c++
 Rapyd::Info("Hello World!");
+
 void* ptr = malloc(sizeof(int));
 Rapyd::Critical("Oh no! Pointer p points to -> %p", ptr);
 ```
