@@ -45,6 +45,14 @@ int* ptr = malloc(sizeof(int));
 Rapyd::Critical("Oh no! Pointer p points to -> %p", ptr);
 ```
 
+The logs will be shown on the Rapyd process as follows: 
+```sh
+$ ./rapyd
+
+MAIN_THREAD:    [INFO] Hello World!
+MAIN_THREAD:    [CRITICAL] Oh no! Pointer p points to -> 0xDEADDEAD  
+```
+
 
 
 ## License
