@@ -15,16 +15,16 @@ You can edit the Makefile for different compilers and compile options (defaulted
 Note: C++20 is required for the logger to work so don't change CXX_STANDARD variable in CMake
 
 ```sh
-git clone https://github.com/ykumar21/rapyd_logger
-cd rapyd_logger
-make 
+$ git clone https://github.com/ykumar21/rapyd_logger
+$ cd rapyd_logger
+$ make 
 ```
 
 ## How To Run
 Running Rapyd is easy. 
 Once, the source files have been compiled, run the rapyd executable as a seperate process. 
 ```sh
-make run
+$ make run
 ```
 
 Once done, Rapyd is ready to log. Simply, register a different process with Rapyd to start logging. 
