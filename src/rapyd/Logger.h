@@ -3,6 +3,7 @@
 
 #include "Message.h"
 
+/* Allowed level types */ 
 enum LoggerLevel {
     Info, 
     Warn, 
