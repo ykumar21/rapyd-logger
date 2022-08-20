@@ -18,9 +18,10 @@ message.o: rapyd/Message.cpp
 
 process.o: rapyd/Process.cpp
 	${CXX} ${CXXFLAGS} -c rapyd/Process.cpp
-	
+
 clean: 
 	rm -f *.o output 
 
+
 run:
-	./output
+	rm -f tmp/pipe/*; ./output

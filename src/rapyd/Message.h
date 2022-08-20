@@ -6,9 +6,8 @@ struct Message {
 private:
     T data; 
 public:
-    /**** FACTORY METHODS *****/
     
-    // Specialised factory for const char* data with args 
+    /* Specialised factory for const char* data with args */
     template <typename... Args> 
     static Message create(T data, Args... args) 
     requires(std::is_same_v<T, const char*>) 
@@ -16,7 +15,7 @@ public:
         return Message<T>();
     };
 
-    // Generic factory method
+    /* Generic factory method */
     template <typename... Args> 
     static Message create(T data, Args... args) {
         return Message<T>();

@@ -3,7 +3,7 @@
 
 #include "Message.h"
 
-/* Allowed level types */ 
+/* allowed level types*/ 
 enum LoggerLevel {
     Info, 
     Warn, 
@@ -13,9 +13,10 @@ enum LoggerLevel {
 
 class Logger {
 private: 
-    int max_queue_size;
-    static LoggerLevel log_level; 
-    inline static bool append_line_feed = true;
+    int                     max_queue_size;
+    static LoggerLevel      log_level; 
+    inline static bool      append_line_feed = true;
+
 public:  
     void linefeed(bool opt);
 
@@ -31,7 +32,9 @@ public:
 
 template <typename T, typename... Args> 
 void Logger::Info(Message<T> message, Args... args) {
-    T* data_ptr = message.get_data();
+    T*  data_ptr;
+
+    data_ptr = message.get_data();
     if (data_ptr != nullptr) {
         printf("[INFO]\t");
         printf(*data_ptr, args...);
