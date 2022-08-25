@@ -15,11 +15,12 @@ Process::Process(const char* process_name) {
 
 std::optional<const char*> Process::create_fifo_pipe() 
 {
-    int     ret, fd;
-    FILE    *rd_stream, *wr_stream;
-
+    int         ret, fd;
+    FILE        *rd_stream, *wr_stream;
+    char        *pipe_fpath;
+    
     // FIFO file path
-    const char* pipe_fpath = "./tmp/pipe/new";
+    pipe_fpath = "./tmp/pipe/nw";
 
     // Create file(FIFO)
     ret = mkfifo(pipe_fpath, 0666);
@@ -30,7 +31,7 @@ std::optional<const char*> Process::create_fifo_pipe()
     printf("Created pipe %s\n", pipe_fpath);
 
     /* open pipe for writing only */
-    fd = open( pipe_fpath, O_WRONLY | O_NONBLOCK );
+    fd = open( pipe_fpath, O_WRONLY );
     if (fd == -1) {
         printf("Error opening pipe: %s\n", pipe_fpath);
         return {};
