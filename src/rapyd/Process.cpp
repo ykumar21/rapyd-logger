@@ -80,14 +80,9 @@ std::optional<c_str> Process::create_fifo_pipe()
     
     // FIFO file path
     pipe_fpath = "./tmp/pipe/nw1";
-
     // Create file(FIFO)
     ret = mkfifo(pipe_fpath, FIFO_PERM);
     
-    printf("----- FD ------\n");
-    printf("\tRead: %d\n", fd[0]);
-    printf("\tWrite: %d\n", fd[1]);
-
     if (ret != 0) {
         fprintf(stderr, "Unable to create fifo; errorno=%d\n", errno);
         exit(1); /* Print error message and return */ 

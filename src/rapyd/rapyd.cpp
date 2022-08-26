@@ -5,17 +5,20 @@
 
 typedef const char* c_str;
 
-namespace Rapyd {
-    Process Register(const char* process_name) {
-        Process proc(process_name);
+class Rapyd {
+private:   
+    
+public:
+    static Process Register(c_str proc_name) {
+        printf("Registering %s...\n", proc_name);
+        Process proc(proc_name);
         proc._register();
         return proc;
     }
 
-    void Write(Process p) {
+    static void Write(Process p) {
         p.write_to_pipe("Hey!");
     }
-
 };
 
 int main(int argc, char** argv) {
