@@ -6,15 +6,24 @@
 
 typedef const char* c_str;
 
+#define RDBUF_SIZE 80 /* read buffer size */ 
+
+
 /* Process for logging */ 
 class Process {
 private:
     c_str   process_name;
     int     fd[2];
-    pid_t   childpid;    
+    pid_t   childpid;   
+    char    rd_buf[RDBUF_SIZE];
+    char    *buf_p=rd_buf, *buf_end = &rd_buf[RDBUF_SIZE-1]; /* buffer pointers  */
+     
 
     /* Create fifo pipe */ 
     std::optional<c_str> create_fifo_pipe();
+
+    /* Flush the read buffer */ 
+    void flush_rdbuf();
 public:
     /* default constructor */ 
     Process(const char* process_name);
@@ -37,10 +46,10 @@ public:
     void set_childpid() { fprintf(stderr, "Dont set pid.. call create_fifo_pipe"); }
 
     /* read data from pipe */ 
-    void read_from_pipe(int);
+    void read_from_pipe();
 
     /* write data to pipe */ 
-    void write_to_pipe(int, c_str);
+    void write_to_pipe(c_str);
 };
 
 #endif

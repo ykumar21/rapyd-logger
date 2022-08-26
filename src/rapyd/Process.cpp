@@ -23,7 +23,6 @@ typedef const char* c_str;
 #define FIFO_PERM 0666 /* rw-rw-rw- */
 #endif
 
-#define RDBUF_SIZE 80   /* read buffer size */
 
 
 Process::Process(c_str process_name) {
@@ -38,64 +37,84 @@ void Process::print_buf(char *buf, char *buf_p) {
     }
 }
 
-void Process::read_from_pipe(int fd) {
-    int     chr;
+void Process::flush_rdbuf() {
+    /* move buffer pointer to first position */ 
+    buf_p = rd_buf;
+}
+
+void Process::read_from_pipe() {
+    int     chr, file = fd[0];
     FILE    *rd_stream;
-    char    rd_buf[RDBUF_SIZE], *buf_p=rd_buf; /* read buffer  */
     
-    rd_stream = fdopen( fd, "r" );
+    printf("buf p: %p, buf end: %p\n", buf_p, buf_end);
+
+    rd_stream = fdopen( file, "r" );
     while ((chr = fgetc(rd_stream)) != EOF) {
-        *buf_p = (char) chr; ++buf_p;
+        if (buf_p <= buf_end) {
+            *buf_p = (char) chr; ++buf_p;
+        } else {
+            printf("Buffer full!\n");
+            flush_rdbuf();
+            break;
+        }
     }
     print_buf(rd_buf, buf_p);
     fclose(rd_stream);
 }
 
-void Process::write_to_pipe(int fd, c_str message) {
+void Process::write_to_pipe(c_str message) {
     FILE    *wr_stream;
+    int     file = fd[1];
 
-    wr_stream = fdopen( fd, "w" );
+    wr_stream = fdopen( file, "w" );
     fprintf(wr_stream, "%s\n", message);
     fclose(wr_stream);
 }
 
 std::optional<c_str> Process::create_fifo_pipe() 
 {
-    int     ret, fd[2];
+    int     ret;
     FILE    *rd_stream, *wr_stream;
     c_str   pipe_fpath;
     pid_t   childpid;
     
     // FIFO file path
-    pipe_fpath = "./tmp/pipe/nw";
+    pipe_fpath = "./tmp/pipe/nw1";
 
     // Create file(FIFO)
-    ret = pipe(fd); 
+    ret = mkfifo(pipe_fpath, FIFO_PERM);
+    
+    printf("----- FD ------\n");
+    printf("\tRead: %d\n", fd[0]);
+    printf("\tWrite: %d\n", fd[1]);
+
     if (ret != 0) {
         fprintf(stderr, "Unable to create fifo; errorno=%d\n", errno);
         exit(1); /* Print error message and return */ 
     }
 
-    printf("Created pipe %s\n", pipe_fpath);
-    childpid = fork();
-    
-    if (childpid == static_cast<pid_t>(0)) {
-        /* This is the child process
-           Close other end first.  */
-        printf("=== CHILD ===\n");
-        /* close output side of pipe */
-        close(fd[1]); 
-        read_from_pipe(fd[0]);
-    } else if (childpid < static_cast<pid_t>( 0 )) {
-        perror("fork error");
-        exit(1);
-    } else {
-        /* This is the parent process. */ 
-          printf("=== %s ===\n", this->process_name);
-        /* close input side of pipe */ 
-        close(fd[0]);
-        write_to_pipe(fd[1], "Hey!");
+    while (true) {
+        /* blocking call to open fifo in read only */ 
+        fd[0] = open(pipe_fpath, O_RDONLY);
+        read_from_pipe();
     }
+    // if (childpid == static_cast<pid_t>(0)) {
+    //     /* This is the child process
+    //        Close other end first.  */
+    //     printf("=== CHILD ===\n");
+    //     /* close output side of pipe */
+    //     close(fd[1]); 
+    //     read_from_pipe();
+    // } else if (childpid < static_cast<pid_t>( 0 )) {
+    //     perror("fork error");
+    //     exit(1);
+    // } else {
+    //     /* This is the parent process. */ 
+    //       printf("=== %s ===\n", this->process_name);
+    //     /* close input side of pipe */ 
+    //     close(fd[0]);
+    //     write_to_pipe("Hey!");
+    // }
 
     return pipe_fpath;
 }
@@ -103,8 +122,6 @@ std::optional<c_str> Process::create_fifo_pipe()
 
 void Process::_register() {
     std::cout << "Registered process " << process_name << '\n';
-
     /* create pipe or fallback to default pipe */ 
     const char* pipe_fpath = create_fifo_pipe().value_or(DEFAULT_PIPE);
-    printf("Pipe using: %s\n", pipe_fpath);
 }

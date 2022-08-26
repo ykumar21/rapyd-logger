@@ -6,14 +6,14 @@
 typedef const char* c_str;
 
 namespace Rapyd {
-    void Register(const char* process_name) {
-        Process p(process_name);
-        p._register();
+    Process Register(const char* process_name) {
+        Process proc(process_name);
+        proc._register();
+        return proc;
     }
 
-    void Write(Process *p) {
-        if (p == nullptr) exit(1);
-        p->write_to_pipe(1, "Hey!");
+    void Write(Process p) {
+        p.write_to_pipe("Hey!");
     }
 
 };
@@ -21,7 +21,8 @@ namespace Rapyd {
 int main(int argc, char** argv) {
     c_str log_message = "Hi!";
     Message<c_str> message = Message<c_str>::create(log_message);
-    Rapyd::Register("MAIN_THREAD");
+    Process proc = Rapyd::Register("MAIN_THREAD");
+    Rapyd::Write(proc);
 }
 
 
